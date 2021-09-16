@@ -96,18 +96,11 @@ SupportedPackage = namedtuple("SupportedPackage", ["path", "format", "filter"])
 def find_supported_packages():
     installation_dirs = []
 
-    # Try and find ale-py
+    # Try and find AutoROM.roms
     try:
-
-        # isSupportedROM filter. There's some multi-agent games that aren't supported in ale-py.
-        def _ale_py_filter(path):
-            from ale_py import ALEInterface
-
-            return ALEInterface.isSupportedROM(path) is not None
-
         installation_dirs.append(
             SupportedPackage(
-                resources.files("ale_py") / "roms", "{rom}.bin", _ale_py_filter
+                resources.files("AutoROM") / "roms", "{rom}.bin", lambda _: True 
             )
         )
     except ModuleNotFoundError:
@@ -137,26 +130,6 @@ def find_supported_packages():
     return installation_dirs
 
 
-@click.command()
-@click.option(
-    "-v",
-    "-y",
-    "--accept-license",
-    is_flag=True,
-    default=False,
-    type=bool,
-    help="Accept license agreement",
-)
-@click.option(
-    "-d",
-    "--install-dir",
-    default=None,
-    type=click.Path(exists=True),
-    help="User specified install directory",
-)
-@click.option(
-    "--quiet", is_flag=True, default=False, help="Suppress installation output."
-)
 def main(accept_license, install_dir, quiet):
     if install_dir is not None:
         packages = [
@@ -213,5 +186,29 @@ def main(accept_license, install_dir, quiet):
     print("Done!")
 
 
+@click.command()
+@click.option(
+    "-v",
+    "-y",
+    "--accept-license",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Accept license agreement",
+)
+@click.option(
+    "-d",
+    "--install-dir",
+    default=None,
+    type=click.Path(exists=True),
+    help="User specified install directory",
+)
+@click.option(
+    "--quiet", is_flag=True, default=False, help="Suppress installation output."
+)
+def cli(accept_license, install_dir, quiet):
+    main(accept_license, install_dir, quiet)
+
+
 if __name__ == "__main__":
-    main()
+    cli()
